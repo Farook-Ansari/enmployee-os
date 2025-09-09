@@ -7,7 +7,7 @@ import NewEmployeeStep2 from "./components/NewEmployeeStep2.jsx";
 import NewEmployeeStep3 from "./components/NewEmployeeStep3.jsx";
 import SLAAgreement from "./components/SLAAgreement.jsx";
 import Profile from "./components/Profile.jsx";
-import Chat from "./components/Chat.jsx"; // Added import for Chat component
+import Chat from "./components/Chat.jsx";
 
 export default function App() {
   return (
