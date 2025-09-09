@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./components/Login.jsx";
+import Login from "./components/login.jsx";
 import AppLayout from "./components/AppLayout.jsx";
 import Home from "./components/Home.jsx";
 import NewEmployee from "./components/NewEmployee.jsx";
