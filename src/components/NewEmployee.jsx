@@ -1,6 +1,10 @@
+// src/pages/NewEmployee.jsx
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function NewEmployee() {
+  const nav = useNavigate();
+
   const [jobDesc, setJobDesc] = useState("");
   const [resp, setResp] = useState([]); // [{ id, text, checked }]
   const [loading, setLoading] = useState(false);
@@ -13,73 +17,87 @@ export default function NewEmployee() {
         "Develop and implement databases, data collection systems, and analytics strategies.",
         "Create visualizations and reports for requested projects.",
         "Work with management to prioritize business and information needs.",
-        "Locate and define new process improvement opportunities."
+        "Locate and define new process improvement opportunities.",
       ].map((text, i) => ({ id: i + 1, text, checked: true })); // default checked
       setResp(items);
       setLoading(false);
     }, 900);
   };
 
-  const allChecked = useMemo(() => resp.length > 0 && resp.every(r => r.checked), [resp]);
-  const anyChecked = useMemo(() => resp.some(r => r.checked), [resp]);
+  const allChecked = useMemo(
+    () => resp.length > 0 && resp.every((r) => r.checked),
+    [resp]
+  );
+  const anyChecked = useMemo(() => resp.some((r) => r.checked), [resp]);
 
   const toggleOne = (id) =>
-    setResp(list => list.map(r => (r.id === id ? { ...r, checked: !r.checked } : r)));
+    setResp((list) =>
+      list.map((r) => (r.id === id ? { ...r, checked: !r.checked } : r))
+    );
 
   const toggleAll = () =>
-    setResp(list => list.map(r => ({ ...r, checked: !allChecked })));
+    setResp((list) => list.map((r) => ({ ...r, checked: !allChecked })));
 
   const updateText = (id, text) =>
-    setResp(list => list.map(r => (r.id === id ? { ...r, text } : r)));
+    setResp((list) => list.map((r) => (r.id === id ? { ...r, text } : r)));
 
   const removeOne = (id) =>
-    setResp(list => list.filter(r => r.id !== id));
+    setResp((list) => list.filter((r) => r.id !== id));
 
   const addOne = () =>
-    setResp(list => [
-      ...list,
-      { id: Date.now(), text: "", checked: true }
-    ]);
+    setResp((list) => [...list, { id: Date.now(), text: "", checked: true }]);
+
+  // Navigate to Step 2 with selected data
+  const goToStep2 = () => {
+    const selected = resp.filter((r) => r.checked).map((r) => r.text);
+    nav("/employees/new/step-2", {
+      state: { jobDesc, responsibilities: selected },
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-3xl">
         <header className="mb-6">
           <h1 className="text-2xl font-bold">Create a New Employee.AI</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-sm text-gray-500">
             Follow the steps to set up your new AI-powered team member.
           </p>
         </header>
 
         {/* Step card */}
-        <div className="rounded-xl bg-white shadow p-6 space-y-6">
+        <div className="space-y-6 rounded-xl bg-white p-6 shadow">
           {/* Step 1 */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="size-7 rounded-full bg-blue-600 text-white text-sm grid place-items-center font-bold">
+            <div className="mb-2 flex items-center gap-2">
+              <div className="grid size-7 place-items-center rounded-full bg-blue-600 text-sm font-bold text-white">
                 1
               </div>
               <h2 className="font-semibold">Provide a Job Description</h2>
             </div>
-            <p className="text-sm text-gray-500 mb-4">
-              Paste a complete job description below. Our AI will analyze it to extract key
-              responsibilities, skills, and qualifications.
+            <p className="mb-4 text-sm text-gray-500">
+              Paste a complete job description below. Our AI will analyze it to
+              extract key responsibilities, skills, and qualifications.
             </p>
+
             <textarea
               rows={5}
-              className="w-full rounded-lg border p-3 focus:border-blue-600 focus:ring-blue-600"
+              className="w-full rounded-lg border p-3 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
               placeholder="e.g. As a Data Analyst, you will be responsible for..."
               value={jobDesc}
               onChange={(e) => setJobDesc(e.target.value)}
             />
             <div className="mt-2 text-sm">
-              <a href="#" className="text-blue-600 hover:underline">Or, upload a file</a>
+              <a href="#" className="text-blue-600 hover:underline">
+                Or, upload a file
+              </a>
             </div>
+
             <button
               type="button"
               onClick={generateResponsibilities}
               disabled={!jobDesc || loading}
-              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {loading ? "Generating..." : "Generate Responsibilities"}
             </button>
@@ -102,7 +120,7 @@ export default function NewEmployee() {
               </div>
 
               <ul className="space-y-2">
-                {resp.map(item => (
+                {resp.map((item) => (
                   <li key={item.id} className="rounded-lg border bg-gray-50 p-3">
                     <div className="flex items-start gap-3">
                       <input
@@ -141,8 +159,9 @@ export default function NewEmployee() {
 
                 <div className="ml-auto">
                   <button
+                    onClick={goToStep2}
                     disabled={!anyChecked}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                    className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                   >
                     Next: Configure Skills →
                   </button>
@@ -150,7 +169,8 @@ export default function NewEmployee() {
               </div>
 
               <p className="mt-2 text-xs text-gray-500">
-                Tip: Edit any item inline. Only checked items will be used in the next step.
+                Tip: Edit any item inline. Only checked items will be used in the
+                next step.
               </p>
             </div>
           )}

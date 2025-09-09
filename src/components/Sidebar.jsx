@@ -11,10 +11,10 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { to: "/", label: "Home", icon: Home },
+  { to: "/home", label: "Home", icon: Home },           // ✅ was "/"
   { to: "/employees/new", label: "New Employee", icon: UserPlus },
-  { to: "/employees", label: "Employees", icon: Users },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/employees", label: "Employees", icon: Users }, // (add route later if needed)
+  { to: "/settings", label: "Settings", icon: Settings }, // (add route later if needed)
 ];
 
 export default function Sidebar() {
@@ -22,8 +22,9 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`h-screen sticky top-0 border-r bg-white transition-all duration-300
-      ${collapsed ? "w-20" : "w-64"}`}
+      className={`h-screen sticky top-0 border-r bg-white transition-all duration-300 ${
+        collapsed ? "w-20" : "w-64"
+      }`}
       aria-label="Sidebar"
     >
       <div className="flex h-full flex-col">
@@ -57,11 +58,13 @@ export default function Sidebar() {
             <NavLink
               key={to}
               to={to}
+              end={to === "/home"} // ensure exact match highlighting on Home
               className={({ isActive }) =>
-                `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition
-                ${isActive
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                  : "text-gray-700 hover:bg-gray-50"}`
+                `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                  isActive
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`
               }
               aria-label={label}
             >
@@ -71,8 +74,7 @@ export default function Sidebar() {
               {/* Tooltip when collapsed */}
               {collapsed && (
                 <span
-                  className="pointer-events-none absolute left-14 z-20 hidden rounded-md bg-gray-900 px-2 py-1 text-xs text-white shadow
-                             group-hover:block"
+                  className="pointer-events-none absolute left-14 z-20 hidden rounded-md bg-gray-900 px-2 py-1 text-xs text-white shadow group-hover:block"
                   role="tooltip"
                 >
                   {label}

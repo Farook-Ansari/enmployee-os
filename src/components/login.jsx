@@ -1,3 +1,4 @@
+// src/components/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,8 +15,8 @@ export default function Login() {
 
   const submit = (e) => {
     e.preventDefault();
-    // TODO: real auth flow
-    nav("/");
+    // TODO: real auth; set token/session here
+    nav("/home"); // ✅ go to Home after login
   };
 
   return (
@@ -26,7 +27,7 @@ export default function Login() {
           <div className="w-full max-w-md">
             {/* Logo / Brand */}
             <div className="mb-8 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-emerald-600 grid place-items-center text-white font-bold">
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-emerald-600 text-white font-bold">
                 G
               </div>
               <div className="text-lg font-semibold">GENFOX • Employee-OS</div>
@@ -34,7 +35,8 @@ export default function Login() {
 
             <h1 className="mb-1 text-2xl font-bold">Sign in to your account</h1>
             <p className="mb-6 text-sm text-gray-500">
-              Or <a className="text-emerald-700 hover:underline" href="#">
+              Or{" "}
+              <a className="text-emerald-700 hover:underline" href="#">
                 start your 14-day free trial
               </a>
             </p>
@@ -95,7 +97,7 @@ export default function Login() {
                 </a>
               </div>
 
-              {/* Primary button */}
+              {/* Sign in */}
               <button
                 type="submit"
                 className="w-full rounded-lg bg-emerald-600 py-2.5 font-medium text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
@@ -105,10 +107,10 @@ export default function Login() {
 
               {/* Divider */}
               <div className="relative py-2 text-center">
-                <span className="bg-white px-2 text-xs text-gray-500 relative z-10">
+                <span className="relative z-10 bg-white px-2 text-xs text-gray-500">
                   or continue with
                 </span>
-                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-t"></div>
+                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-t" />
               </div>
 
               {/* Social buttons */}
@@ -133,9 +135,15 @@ export default function Login() {
                 Our platform makes it easy to onboard, manage, and deploy AI employees tailored to your business needs.
               </p>
               <ul className="mt-4 space-y-2 text-sm">
-                <li className="flex items-start gap-2"><Check/> Seamless integration with your existing tools.</li>
-                <li className="flex items-start gap-2"><Check/> 24/7 autonomous operation.</li>
-                <li className="flex items-start gap-2"><Check/> Secure and compliant with enterprise standards.</li>
+                <li className="flex items-start gap-2">
+                  <Check /> Seamless integration with your existing tools.
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check /> 24/7 autonomous operation.
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check /> Secure and compliant with enterprise standards.
+                </li>
               </ul>
             </div>
           </div>
@@ -158,7 +166,13 @@ function SSOButton({ label }) {
 
 function Check() {
   return (
-    <svg className="mt-0.5 size-5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      className="mt-0.5 size-5 flex-none"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M20 6L9 17l-5-5" />
     </svg>
   );
