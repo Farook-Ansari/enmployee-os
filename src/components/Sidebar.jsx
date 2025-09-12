@@ -7,14 +7,13 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  LayoutDashboard,
 } from "lucide-react";
 
 const navItems = [
-  { to: "/home", label: "Home", icon: Home },           // ✅ was "/"
+  { to: "/home", label: "Home", icon: Home },
   { to: "/employees/new", label: "New Employee", icon: UserPlus },
-  { to: "/employees", label: "Employees", icon: Users }, // (add route later if needed)
-  { to: "/settings", label: "Settings", icon: Settings }, // (add route later if needed)
+  { to: null, label: "Employees", icon: Users },   // no action
+  { to: null, label: "Settings", icon: Settings }, // no action
 ];
 
 export default function Sidebar() {
@@ -31,13 +30,16 @@ export default function Sidebar() {
         {/* Header / Brand */}
         <div className="flex items-center justify-between px-3 py-4">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="grid size-10 place-items-center rounded-lg bg-emerald-600 text-white">
-              <LayoutDashboard size={20} />
-            </div>
+            {!collapsed && (
+              <img
+                src="/G.png"
+                alt="GENFOX Logo"
+                className="h-10 w-10 rounded-lg"
+              />
+            )}
             {!collapsed && (
               <div>
                 <div className="font-semibold leading-none">Employee-OS</div>
-                <div className="text-xs text-gray-500">COMMIT INDIA</div>
               </div>
             )}
           </div>
@@ -54,34 +56,51 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <nav className="mt-1 flex-1 space-y-1 px-2">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/home"} // ensure exact match highlighting on Home
-              className={({ isActive }) =>
-                `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`
-              }
-              aria-label={label}
-            >
-              <Icon size={20} className="shrink-0" />
-              {!collapsed && <span className="truncate">{label}</span>}
-
-              {/* Tooltip when collapsed */}
-              {collapsed && (
-                <span
-                  className="pointer-events-none absolute left-14 z-20 hidden rounded-md bg-gray-900 px-2 py-1 text-xs text-white shadow group-hover:block"
-                  role="tooltip"
-                >
-                  {label}
-                </span>
-              )}
-            </NavLink>
-          ))}
+          {navItems.map(({ to, label, icon: Icon }) =>
+            to ? (
+              <NavLink
+                key={label}
+                to={to}
+                end={to === "/home"} // exact match for Home
+                className={({ isActive }) =>
+                  `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                    isActive
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`
+                }
+                aria-label={label}
+              >
+                <Icon size={20} className="shrink-0" />
+                {!collapsed && <span className="truncate">{label}</span>}
+                {collapsed && (
+                  <span
+                    className="pointer-events-none absolute left-14 z-20 hidden rounded-md bg-gray-900 px-2 py-1 text-xs text-white shadow group-hover:block"
+                    role="tooltip"
+                  >
+                    {label}
+                  </span>
+                )}
+              </NavLink>
+            ) : (
+              <div
+                key={label}
+                className="group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 cursor-not-allowed"
+                aria-label={label}
+              >
+                <Icon size={20} className="shrink-0" />
+                {!collapsed && <span className="truncate">{label}</span>}
+                {collapsed && (
+                  <span
+                    className="pointer-events-none absolute left-14 z-20 hidden rounded-md bg-gray-900 px-2 py-1 text-xs text-white shadow group-hover:block"
+                    role="tooltip"
+                  >
+                    {label}
+                  </span>
+                )}
+              </div>
+            )
+          )}
         </nav>
 
         {/* Footer */}

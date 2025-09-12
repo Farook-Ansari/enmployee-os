@@ -72,10 +72,9 @@ export default function Profile() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="btn-outline" onClick={() => navigate("/chat")}>Chat</button>
               <button className="btn-outline">Upgrade Autonomy</button>
               <button className="btn-outline">Freeze Agent</button>
-              <button className="btn-primary">Run Demo Task</button>
+              <button className="btn-primary" onClick={() => navigate("/chat")}>Chat</button>
             </div>
           </div>
 

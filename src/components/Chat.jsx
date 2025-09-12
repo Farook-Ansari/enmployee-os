@@ -131,29 +131,8 @@ export default function Chat() {
 
   return (
     <div className="font-sans bg-white text-gray-900 flex flex-col h-screen w-full">
-      {/* Header — light surface, green accent like sidebar */}
-      <header className="bg-white border-b border-gray-200 p-4 flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-emerald-600 mr-3"
-          aria-hidden="true"
-        >
-          <path d="M3 3h18v4H3z" />
-          <path d="M3 11h18v10H3z" />
-        </svg>
-        <h1 className="text-xl font-bold text-gray-900">Alex</h1>
-      </header>
-
       {/* Messages */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-gray-50">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-gray-50 max-h-screen">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -162,11 +141,14 @@ export default function Chat() {
             }`}
           >
             {message.sender === "bot" && (
-              <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                B
+              <div className="w-8 h-8 rounded-full flex-shrink-0">
+                <img
+                  src="https://i.pravatar.cc/120?u=Alex"
+                  alt="Alex profile"
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
             )}
-
             <div
               className={`max-w-xs md:max-w-2xl rounded-2xl px-4 py-3 shadow-sm border ${
                 message.sender === "user"
@@ -231,25 +213,30 @@ export default function Chat() {
           </div>
         ))}
 
-        {isLoading && (
-          <div className="flex items-end gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-              B
-            </div>
-            <div className="max-w-xs md:max-w-md rounded-2xl px-4 py-3 shadow-sm bg-white border border-gray-200 rounded-bl-none">
-              <div className="flex items-center justify-center space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" />
-              </div>
-            </div>
-          </div>
-        )}
+{isLoading && (
+  <div className="flex items-end gap-3 justify-start">
+    {/* Replace the "B" placeholder with the bot's profile image */}
+    <div className="w-8 h-8 rounded-full flex-shrink-0">
+      <img
+        src="https://i.pravatar.cc/120?u=Alex"
+        alt="Alex profile"
+        className="w-full h-full rounded-full object-cover"
+      />
+    </div>
+    <div className="max-w-xs md:max-w-md rounded-2xl px-4 py-3 shadow-sm bg-white border border-gray-200 rounded-bl-none">
+      <div className="flex items-center justify-center space-x-1">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]" />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]" />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" />
+      </div>
+    </div>
+  </div>
+)}        
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Input — light surface with emerald action */}
-      <footer className="bg-white border-gray-200 ">
+      {/* Input */}
+      <footer className="bg-white border-gray-200 sticky bottom-0">
         <div className="flex items-center bg-white rounded-full p-2 border border-gray-300 focus-within:ring-2 focus-within:ring-emerald-300">
           <input
             type="text"

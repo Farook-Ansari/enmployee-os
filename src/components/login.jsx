@@ -26,13 +26,14 @@ export default function Login() {
         <section className="flex items-center justify-center p-6 md:p-10">
           <div className="w-full max-w-md">
             {/* Logo / Brand */}
-            <div className="mb-8 flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-emerald-600 text-white font-bold">
-                G
-              </div>
-              <div className="text-lg font-semibold">GENFOX • Employee-OS</div>
-            </div>
-
+<div className="mb-8 flex items-center gap-3">
+  <img
+    src="/G.png"
+    alt="GENFOX Logo"
+    className="h-10 w-10 rounded-lg"
+  />
+  <div className="text-lg font-semibold">GENFOX • Employee-OS</div>
+</div>
             <h1 className="mb-1 text-2xl font-bold">Sign in to your account</h1>
             <p className="mb-6 text-sm text-gray-500">
               Or{" "}
@@ -52,7 +53,6 @@ export default function Login() {
                   required
                 >
                   <option value="">Select your organization</option>
-                  <option>COMMIT INDIA</option>
                   <option>Demo Org</option>
                 </select>
               </label>

@@ -3,18 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Plus } from "lucide-react";
 
 const SUGGESTED = [
-  { id: "powerbi", name: "PowerBI", img: "https://dummyimage.com/80x80/111827/ffffff&text=PB" },
-  { id: "tableau", name: "Tableau", img: "https://dummyimage.com/80x80/334155/ffffff&text=TB" },
-  { id: "snowflake", name: "Snowflake", img: "https://dummyimage.com/80x80/0ea5e9/ffffff&text=SF" },
-  { id: "azure", name: "Microsoft Azure", img: "https://dummyimage.com/80x80/1d4ed8/ffffff&text=AZ" },
-  { id: "postgres", name: "PostgreSQL", img: "https://dummyimage.com/80x80/16a34a/ffffff&text=PG" },
+  { id: "powerbi", name: "Power BI", img: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Power_bi_logo_black.svg" },
+  { id: "tableau", name: "Tableau", img: "https://cdn.worldvectorlogo.com/logos/tableau-software.svg" },
+  { id: "snowflake", name: "Snowflake", img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" },
+  { id: "azure", name: "Microsoft Azure", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" },
+  { id: "postgres", name: "PostgreSQL", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
 ];
 
 export default function NewEmployeeStep3() {
   const nav = useNavigate();
 
   // selected connectors (ids)
-  const [selected, setSelected] = useState(new Set(["powerbi", "tableau", "snowflake"]));
+  const [selected, setSelected] = useState(new Set([, "tableau", ]));
   // channel toggles
   const [portal] = useState(true); // always on
   const [teams, setTeams] = useState(true);
@@ -50,7 +50,7 @@ export default function NewEmployeeStep3() {
             <div className="w-full mr-3 h-1.5 rounded-full bg-gray-200">
               <div className="h-full w-3/5 rounded-full bg-sky-500" />
             </div>
-            <span>Step 3 of 5</span>
+            <span>Step-3</span>
           </div>
           <h1 className="mt-4 text-3xl font-bold">Connectors &amp; Communication Channels</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -143,7 +143,15 @@ function ConnectorCard({ name, img, active, onClick }) {
         active ? "ring-2 ring-sky-400 bg-sky-50" : "hover:bg-gray-50"
       }`}
     >
-      <img src={img} alt={name} className="h-16 w-16 rounded-lg object-cover" />
+      {/* Square image frame so all logos look consistent */}
+      <div className="h-16 w-16 rounded-lg bg-white p-1 grid place-items-center">
+        <img
+          src={img}
+          alt={name}
+          className="max-h-full max-w-full object-contain"
+        />
+      </div>
+
       <div className="mt-3 text-sm font-medium">{name}</div>
       <div
         className={`mt-2 h-6 w-full rounded-md text-xs grid place-items-center ${

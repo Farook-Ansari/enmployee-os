@@ -1,5 +1,5 @@
 // src/pages/NewEmployee.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function NewEmployee() {
@@ -8,6 +8,28 @@ export default function NewEmployee() {
   const [jobDesc, setJobDesc] = useState("");
   const [resp, setResp] = useState([]); // [{ id, text, checked }]
   const [loading, setLoading] = useState(false);
+
+  // NEW: file upload state + ref
+  const [uploadedFileName, setUploadedFileName] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handleUploadClick = (e) => {
+    e.preventDefault();
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFileName(file.name);
+      // If you ever want to read/parse the file, do it here with FileReader or send to backend.
+    }
+  };
+
+  const clearUploadedFile = () => {
+    setUploadedFileName("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const generateResponsibilities = () => {
     setLoading(true);
@@ -87,16 +109,44 @@ export default function NewEmployee() {
               value={jobDesc}
               onChange={(e) => setJobDesc(e.target.value)}
             />
-            <div className="mt-2 text-sm">
-              <a href="#" className="text-blue-600 hover:underline">
+
+            {/* Upload link + hidden input */}
+            <div className="mt-2 text-sm flex items-center gap-2">
+              <a
+                href="#"
+                className="text-blue-600 hover:underline"
+                onClick={handleUploadClick}
+              >
                 Or, upload a file
               </a>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              {uploadedFileName && (
+                <span className="inline-flex items-center gap-2 rounded-md border px-2 py-1 text-gray-600">
+                  <span className="truncate max-w-[220px]">{uploadedFileName}</span>
+                  <button
+                    type="button"
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                    onClick={clearUploadedFile}
+                    title="Clear file"
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
             </div>
 
             <button
               type="button"
               onClick={generateResponsibilities}
-              disabled={!jobDesc || loading}
+              disabled={!jobDesc && !uploadedFileName || loading}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {loading ? "Generating..." : "Generate Responsibilities"}
