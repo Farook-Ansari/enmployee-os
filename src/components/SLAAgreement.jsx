@@ -5,12 +5,15 @@ import { ChevronLeft } from "lucide-react";
 export default function SLAAgreement() {
   const nav = useNavigate();
   const [accepted, setAccepted] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const continueDeploy = (mode) => {
     if (!accepted) {
-      alert("Please accept the SLA before continuing.");
+      setShowError(true);
       return;
     }
+    setShowError(false);
+
     // TODO: save SLA & deployment mode (sandbox/production)
     if (mode === "sandbox") {
       alert("Deploying in Sandbox...");
@@ -34,7 +37,9 @@ export default function SLAAgreement() {
         </div>
 
         {/* Header */}
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">SLA and Policy Boundaries</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          SLA and Policy Boundaries
+        </h1>
         <p className="text-sm text-gray-500 mb-6">
           SLAs for AI employees are crucial. They translate human expectations into
           machine-readable instructions, ensure compliance, and allow tuning of agent
@@ -60,17 +65,30 @@ export default function SLAAgreement() {
 7.0 Anomaly Handling and Escalation: Any anomalies flagged will be escalated immediately to the supervisor.
 8.0 Communication Protocol: All communications will be logged, with proactive updates provided.`}
           />
-          <div className="mt-4 flex items-center gap-2">
+          <div
+            className={`mt-4 flex items-center gap-2 rounded-md p-2 ${
+              showError ? "border border-red-500 bg-red-50" : ""
+            }`}
+          >
             <input
               type="checkbox"
               checked={accepted}
-              onChange={(e) => setAccepted(e.target.checked)}
+              onChange={(e) => {
+                setAccepted(e.target.checked);
+                setShowError(false);
+              }}
               className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600"
             />
             <span className="text-sm text-gray-700">
-              I accept the Service Level Agreement
+              I accept the Service Level Agreement{" "}
+              <span className="text-red-500">*</span>
             </span>
           </div>
+          {showError && (
+            <p className="mt-1 text-sm text-red-600">
+              You must accept the SLA before deploying.
+            </p>
+          )}
         </section>
 
         {/* Footer */}
@@ -82,14 +100,12 @@ export default function SLAAgreement() {
           <div className="flex gap-3">
             <button
               className="btn-outline"
-              disabled={!accepted}
               onClick={() => continueDeploy("sandbox")}
             >
               Deploy in Sandbox
             </button>
             <button
               className="btn-primary"
-              disabled={!accepted}
               onClick={() => continueDeploy("production")}
             >
               Deploy in Production
@@ -100,10 +116,3 @@ export default function SLAAgreement() {
     </div>
   );
 }
-
-/* Tailwind shortcuts (add in index.css @layer if you haven't already)
-@layer components {
-  .btn-primary { @apply inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-white hover:bg-sky-700 disabled:opacity-50; }
-  .btn-outline { @apply inline-flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-gray-50 disabled:opacity-50; }
-}
-*/
