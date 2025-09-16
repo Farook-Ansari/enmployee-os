@@ -49,7 +49,7 @@ export default function Profile() {
         <section className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-start gap-6">
             <img
-              src="https://i.pravatar.cc/120?u=Alex"
+              src="https://i.pravatar.cc/120?u=stew"
               alt={employee.name}
               className="h-24 w-24 rounded-full border object-cover"
             />
@@ -74,7 +74,7 @@ export default function Profile() {
             <div className="flex items-center gap-2">
               <button className="btn-outline">Upgrade Autonomy</button>
               <button className="btn-outline">Freeze Agent</button>
-              <button className="btn-primary" onClick={() => navigate("/chat")}>Test as User</button>
+              <button className="btn-primary" onClick={() => navigate("/chat")}>Test as user</button>
             </div>
           </div>
 
@@ -256,5 +256,4 @@ function CheckIcon({ ok }) {
 function Dot({ type }) {
   const cls = type === "pos" ? "bg-emerald-500" : "bg-rose-500";
   return <span className={`inline-block h-2 w-2 rounded-full ${cls}`} />;
-
 }
