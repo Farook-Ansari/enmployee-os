@@ -120,30 +120,42 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {rows.map((r) => (
-                <tr key={r.name} className="hover:bg-gray-50">
-                  <Td className="font-medium">
-                    {r.name === "Alex" ? (
-                      <Link
-                        to="/employees/profile"
-                        className="text-emerald-600 hover:underline"
-                      >
-                        {r.name}
-                      </Link>
-                    ) : (
-                      r.name
-                    )}
-                  </Td>
-                  <Td>{r.role}</Td>
-                  <Td>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-emerald-700">
-                      <span className="size-2 rounded-full bg-emerald-500" /> Active
-                    </span>
-                  </Td>
-                  <Td>{r.lastRun}</Td>
-                  <Td>{r.spend}</Td>
-                </tr>
-              ))}
+              {rows.map((r) => {
+                // Swap logic for employees table too
+                let imageUser = r.name;
+                if (r.name === "Alex") imageUser = "stew";
+                if (r.name === "stew") imageUser = "Alex";
+
+                return (
+                  <tr key={r.name} className="hover:bg-gray-50">
+                    <Td className="font-medium flex items-center gap-2">
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src={`https://i.pravatar.cc/40?u=${imageUser}`}
+                        alt={r.name}
+                      />
+                      {r.name === "Alex" ? (
+                        <Link
+                          to="/employees/profile"
+                          className="text-emerald-600 hover:underline"
+                        >
+                          {r.name}
+                        </Link>
+                      ) : (
+                        r.name
+                      )}
+                    </Td>
+                    <Td>{r.role}</Td>
+                    <Td>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-emerald-700">
+                        <span className="size-2 rounded-full bg-emerald-500" /> Active
+                      </span>
+                    </Td>
+                    <Td>{r.lastRun}</Td>
+                    <Td>{r.spend}</Td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -163,19 +175,28 @@ function StatCard({ title, value }) {
 }
 
 function Activity({ name, desc, time }) {
-  const isClara = name === "Alex";
+  const isAlex = name === "Alex";
+  const isStew = name === "stew";
+
+  // Swap avatar logic
+  let imageUser = name;
+  if (isAlex) imageUser = "stew";
+  else if (isStew) imageUser = "Alex";
 
   const content = (
     <div className="flex items-center gap-3 rounded-lg border p-3">
       <img
         className="h-10 w-10 rounded-full"
-        src={`https://i.pravatar.cc/40?u=${name}`}
+        src={`https://i.pravatar.cc/40?u=${imageUser}`}
         alt={name}
       />
       <div className="min-w-0">
         <div className="truncate font-medium">
-          {isClara ? (
-            <Link to="/employees/profile" className="text-emerald-600 hover:underline">
+          {isAlex ? (
+            <Link
+              to="/employees/profile"
+              className="text-emerald-600 hover:underline"
+            >
               {name}
             </Link>
           ) : (
@@ -188,7 +209,7 @@ function Activity({ name, desc, time }) {
     </div>
   );
 
-  return isClara ? (
+  return isAlex ? (
     <Link to="/employees/profile" className="block hover:bg-gray-50 rounded-lg">
       {content}
     </Link>
@@ -242,4 +263,5 @@ const rows = [
   { name: "Alex", role: "Customer Support", lastRun: "1 day ago", spend: "$100" },
   { name: "David Patel", role: "Product Manager", lastRun: "4 days ago", spend: "$400" },
   { name: "Emily White", role: "Software Engineer", lastRun: "5 days ago", spend: "$200" },
+  { name: "stew", role: "Operations", lastRun: "8h ago", spend: "$150" }, // ensure Stew is also in table
 ];
