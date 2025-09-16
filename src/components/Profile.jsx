@@ -65,7 +65,7 @@ export default function Profile() {
                 ID: {employee.id} · {employee.dept} · {employee.location}
               </div>
 
-              <div className="mt-3 grid gap-3 sm:gap-4 md:gap-8 md:grid-cols-4">
+              <div className="mt-3 grid gap-1 sm:gap-4  md:grid-cols-4">
                 <KVP label="Manager" value={employee.manager} />
                 <KVP label="Buddy" value={employee.buddy} />
                 <KVP label="Shift & Hours" value={employee.shift} />
@@ -244,7 +244,7 @@ function Badge({ children, color = "gray" }) {
 function KVP({ label, value }) {
   return (
     <div className="rounded-lg border bg-gray-50 px-3 py-2">
-      <div className="text-[10px] sm:text-[11px] uppercase tracking-wide text-gray-500">{label}</div>
+      <div className="text-[10px] sm:text-[11px] md:text-[10px] uppercase tracking-wide text-gray-500">{label}</div>
       <div className="font-medium">{value}</div>
     </div>
   );
