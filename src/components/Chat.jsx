@@ -64,7 +64,18 @@ const downloadCsv = (rows, columns, filename = "tableau_view.csv") => {
   URL.revokeObjectURL(url);
 };
 
+// --- Helper for avatar swap (Alex <-> Stew) ---
+const getAvatarSeed = (name) => {
+  if (name === "Alex") return "stew"; // Alex shows Stew's face
+  if (name === "stew") return "Alex"; // Stew shows Alex's face
+  return name; // everyone else unchanged
+};
+
 export default function Chat() {
+  // Bot identity (kept as Alex)
+  const BOT_NAME = "Alex";
+  const BOT_AVATAR_SEED = getAvatarSeed(BOT_NAME);
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -143,8 +154,8 @@ export default function Chat() {
             {message.sender === "bot" && (
               <div className="w-8 h-8 rounded-full flex-shrink-0">
                 <img
-                  src="https://i.pravatar.cc/120?u=Alex"
-                  alt="Alex profile"
+                  src={`https://i.pravatar.cc/120?u=${BOT_AVATAR_SEED}`}
+                  alt={`${BOT_NAME} profile`}
                   className="w-full h-full rounded-full object-cover"
                 />
               </div>
@@ -213,25 +224,25 @@ export default function Chat() {
           </div>
         ))}
 
-{isLoading && (
-  <div className="flex items-end gap-3 justify-start">
-    {/* Replace the "B" placeholder with the bot's profile image */}
-    <div className="w-8 h-8 rounded-full flex-shrink-0">
-      <img
-        src="https://i.pravatar.cc/120?u=Alex"
-        alt="Alex profile"
-        className="w-full h-full rounded-full object-cover"
-      />
-    </div>
-    <div className="max-w-xs md:max-w-md rounded-2xl px-4 py-3 shadow-sm bg-white border border-gray-200 rounded-bl-none">
-      <div className="flex items-center justify-center space-x-1">
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]" />
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]" />
-        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" />
-      </div>
-    </div>
-  </div>
-)}        
+        {isLoading && (
+          <div className="flex items-end gap-3 justify-start">
+            {/* Bot typing indicator with swapped avatar */}
+            <div className="w-8 h-8 rounded-full flex-shrink-0">
+              <img
+                src={`https://i.pravatar.cc/120?u=${BOT_AVATAR_SEED}`}
+                alt={`${BOT_NAME} profile`}
+                className="w-full h-full rounded-full object-cover"
+              />
+            </div>
+            <div className="max-w-xs md:max-w-md rounded-2xl px-4 py-3 shadow-sm bg-white border border-gray-200 rounded-bl-none">
+              <div className="flex items-center justify-center space-x-1">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.3s]" />
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:-0.15s]" />
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </main>
 
