@@ -13,7 +13,7 @@ export default function AppLayout() {
           {/* Optional: Top bar */}
           <header className="sticky top-0 z-10 bg-white border-b">
             <div className="h-14 px-4 md:px-6 flex items-center justify-between">
-              <h1 className="font-semibold">GENFOX • Employee-OS</h1>
+              <h1 className="font-semibold">GENFOX • Data Analyst</h1>
               <div className="flex items-center gap-3">
                 <img
                   alt="user"
@@ -32,3 +32,4 @@ export default function AppLayout() {
     </div>
   );
 }
+
