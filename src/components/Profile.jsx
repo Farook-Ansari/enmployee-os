@@ -65,7 +65,7 @@ export default function Profile() {
                 ID: {employee.id} · {employee.dept} · {employee.location}
               </div>
 
-              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2 md:grid-cols-4">
+              <div className="mt-3 grid gap-3 sm:gap-4 md:gap-8 md:grid-cols-4">
                 <KVP label="Manager" value={employee.manager} />
                 <KVP label="Buddy" value={employee.buddy} />
                 <KVP label="Shift & Hours" value={employee.shift} />
