@@ -74,7 +74,7 @@ export default function Profile() {
             <div className="flex items-center gap-2">
               <button className="btn-outline">Upgrade Autonomy</button>
               <button className="btn-outline">Freeze Agent</button>
-              <button className="btn-primary" onClick={() => navigate("/chat")}>Chat</button>
+              <button className="btn-primary" onClick={() => navigate("/chat")}>Test as User</button>
             </div>
           </div>
 
@@ -256,4 +256,5 @@ function CheckIcon({ ok }) {
 function Dot({ type }) {
   const cls = type === "pos" ? "bg-emerald-500" : "bg-rose-500";
   return <span className={`inline-block h-2 w-2 rounded-full ${cls}`} />;
+
 }
