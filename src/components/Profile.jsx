@@ -45,69 +45,66 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="mx-auto max-w-6xl space-y-6">
-        {/* Header card */}
-        <section className="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-wrap items-start gap-4 sm:gap-6">
-            <img
-              src="https://i.pravatar.cc/120?u=stew"
-              alt={employee.name}
-              className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full border object-cover"
-            />
+{/* Header card */}
+<section className="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm">
+  {/* ⬇️ was flex; change to grid with 3 cols on md+ */}
+  <div className="grid grid-cols-1 md:grid-cols-[auto,1fr,auto] items-start gap-4 sm:gap-6">
+    {/* Avatar */}
+    <img
+      src="https://i.pravatar.cc/120?u=stew"
+      alt={employee.name}
+      className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full border object-cover"
+    />
 
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">{employee.name}</h1>
-                {employee.status.active && <Badge color="emerald">Active</Badge>}
-                {employee.status.healthy && <Badge color="sky">Healthy</Badge>}
-              </div>
+    {/* Name + status */}
+    <div className="min-w-0">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">{employee.name}</h1>
+        {employee.status.active && <Badge color="emerald">Active</Badge>}
+        {employee.status.healthy && <Badge color="sky">Healthy</Badge>}
+      </div>
+      <div className="mt-1 text-xs sm:text-sm text-gray-600">
+        ID: {employee.id} · {employee.dept} · {employee.location}
+      </div>
+    </div>
 
-              <div className="mt-1 text-xs sm:text-sm text-gray-600">
-                ID: {employee.id} · {employee.dept} · {employee.location}
-              </div>
+    {/* Actions */}
+    <div className="w-full md:w-auto md:self-start flex flex-col md:flex-row md:items-center gap-2 md:gap-2 order-last md:order-none mt-2 md:mt-0">
+      <button className="btn-outline w-full md:w-auto">Upgrade Autonomy</button>
+      <button className="btn-outline w-full md:w-auto">Freeze Agent</button>
+      <button className="btn-primary w-full md:w-auto" onClick={() => navigate("/chat")}>
+        Test as user
+      </button>
+    </div>
 
-              <div className="mt-3 grid gap-1 sm:gap-4  md:grid-cols-4">
-                <KVP label="Manager" value={employee.manager} />
-                <KVP label="Buddy" value={employee.buddy} />
-                <KVP label="Shift & Hours" value={employee.shift} />
-                <KVP label="SLA" value={employee.sla} />
-              </div>
-            </div>
+    {/* ⬇️ NEW: Full-width KVP grid on the next row */}
+    <div className="md:col-span-3 mt-3 grid gap-1 sm:gap-4 grid-cols-2 md:grid-cols-4">
+      <KVP label="Manager" value={employee.manager} />
+      <KVP label="Buddy" value={employee.buddy} />
+      <KVP label="Shift & Hours" value={employee.shift} />
+      <KVP label="SLA" value={employee.sla} />
+    </div>
+  </div>
 
-            {/* Actions: stack on small, inline on md+ */}
-            <div className="w-full md:w-auto md:self-start flex flex-col md:flex-row md:items-center gap-2 md:gap-2 order-last md:order-none mt-2 md:mt-0">
-              <button className="btn-outline w-full md:w-auto">Upgrade Autonomy</button>
-              <button className="btn-outline w-full md:w-auto">Freeze Agent</button>
-              <button className="btn-primary w-full md:w-auto" onClick={() => navigate("/chat")}>
-                Test as user
-              </button>
-            </div>
-          </div>
-
-          {/* Tabs: horizontal scroll on mobile/tablet */}
-          <div className="mt-5 -mx-4 sm:mx-0">
-            <div className="flex gap-2 sm:gap-3 overflow-x-auto px-4 pb-1 snap-x snap-mandatory">
-              {[
-                "Overview",
-                "Runs",
-                "Self-Healing Memory",
-                "Approvals",
-                "Connectors",
-                "Skills",
-                "Compliance",
-                "Audit",
-              ].map((t, i) => (
-                <button
-                  key={t}
-                  className={`whitespace-nowrap rounded-full px-3 py-1.5 snap-start ${
-                    i === 0 ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+  {/* Tabs (unchanged) */}
+  <div className="mt-5 -mx-4 sm:mx-0">
+    <div className="flex gap-2 sm:gap-3 overflow-x-auto px-4 pb-1 snap-x snap-mandatory">
+      {[
+        "Overview","Runs","Self-Healing Memory","Approvals",
+        "Connectors","Skills","Compliance","Audit",
+      ].map((t, i) => (
+        <button
+          key={t}
+          className={`whitespace-nowrap rounded-full px-3 py-1.5 snap-start ${
+            i === 0 ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
 
         {/* KPI stats */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
