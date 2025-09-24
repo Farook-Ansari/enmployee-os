@@ -252,7 +252,7 @@ export default function Chat() {
           <input
             type="text"
             className="flex-1 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none px-4"
-            placeholder="Ask me about your Tableau views…"
+            placeholder="Ask me your queries…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -287,3 +287,4 @@ export default function Chat() {
     </div>
   );
 }
+
