@@ -229,8 +229,3 @@ function RadioCard({ checked, onChange, title, desc }) {
   );
 }
 
-/* Tailwind shortcut classes (apply via @layer in your index.css if you like)
-   .input       => w-full rounded-lg border border-gray-300 p-2.5 outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600
-   .btn-primary => inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-white hover:bg-sky-700
-   .btn-outline => inline-flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-gray-50
-*/
