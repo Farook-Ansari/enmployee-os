@@ -1,11 +1,12 @@
+// AppLayout.jsx
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
-import Chat from "./Chat";
 import { Bell, MessageSquare, X } from "lucide-react";
 import { AssistantProvider, useAssistant } from "./AssistantContext.jsx";
 
-const SIDEBAR_WIDTH = 256;
+function cx(...c) { return c.filter(Boolean).join(" "); }
+const GLASS = "supports-[backdrop-filter]:backdrop-blur-xl bg-white/80 border border-white/60 shadow-[0_10px_30px_-12px_rgba(2,6,23,0.12)]";
 
 function computeSidecarWidth() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1440;
@@ -17,16 +18,11 @@ function shouldReserveSpace() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1440;
   return w >= 1024;
 }
-function cx(...c) {
-  return c.filter(Boolean).join(" ");
-}
-const GLASS =
-  "supports-[backdrop-filter]:backdrop-blur-xl bg-white/80 border border-white/60 shadow-[0_10px_30px_-12px_rgba(2,6,23,0.12)]";
 
+/** ---------- TOP-LEVEL: AssistantSidecar (NOT nested) ---------- */
 function AssistantSidecar({ open, width, docked, onClose }) {
   const { pendingMode, pendingValue, setPendingValue, clearPendingRequest } = useAssistant();
 
-  // Only visible input if pendingMode exists
   const modePrompts = {
     "project-ds": "Enter project name and datasource name for publishing mock data source:",
     "filter": "Do you want to apply any filter while listing CSV?",
@@ -61,7 +57,9 @@ function AssistantSidecar({ open, width, docked, onClose }) {
           <div className="h-8 w-8 rounded-xl bg-emerald-600/10 flex items-center justify-center ring-1 ring-emerald-700/20">
             <MessageSquare className="h-4 w-4 text-emerald-700" />
           </div>
-          <div className="font-semibold">{pendingMode ? (pendingMode === "project-ds" ? "Data Source Details" : "Filter Options") : "Approvals"}</div>
+          <div className="font-semibold">
+            {pendingMode ? (pendingMode === "project-ds" ? "Data Source Details" : "Filter Options") : "Approvals"}
+          </div>
         </div>
         <button
           aria-label="Close assistant"
@@ -72,7 +70,7 @@ function AssistantSidecar({ open, width, docked, onClose }) {
         </button>
       </div>
       <div className="flex-1 min-h-0 flex flex-col p-4">
-        {pendingMode && (
+        {pendingMode ? (
           <>
             <div className="pb-2 text-zinc-700">{prompt}</div>
             <input
@@ -90,8 +88,9 @@ function AssistantSidecar({ open, width, docked, onClose }) {
               Submit
             </button>
           </>
+        ) : (
+          <div className="text-zinc-500">Nothing pending</div>
         )}
-        {!pendingMode && <div className="text-zinc-500">Nothing pending</div>}
       </div>
       <div
         className="absolute left-0 top-0 h-full w-1 cursor-col-resize"
@@ -99,21 +98,19 @@ function AssistantSidecar({ open, width, docked, onClose }) {
         onDoubleClick={onClose}
       />
       {!docked && open && (
-        <div
-          className="fixed inset-0 -z-10 bg-black/20"
-          onClick={onClose}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 -z-10 bg-black/20" onClick={onClose} aria-hidden="true" />
       )}
     </aside>
   );
 }
 
-export default function AppLayout() {
+/** ---------- AppShell uses AssistantSidecar ---------- */
+function AppShell() {
   const [isSidecarOpen, setIsSidecarOpen] = useState(false);
   const [sidecarWidth, setSidecarWidth] = useState(computeSidecarWidth());
   const [reserveSpace, setReserveSpace] = useState(shouldReserveSpace());
-  const { pendingVisible } = useAssistant?.() || {};
+
+  const { pendingVisible } = useAssistant();
 
   useEffect(() => {
     const onResize = () => {
@@ -126,7 +123,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === ".") setIsSidecarOpen((v) => !v);
+      if ((e.ctrlKey || e.metaKey) && e.key === ".") setIsSidecarOpen(v => !v);
       if (e.key === "Escape") setIsSidecarOpen(false);
     };
     window.addEventListener("keydown", onKey);
@@ -134,36 +131,50 @@ export default function AppLayout() {
   }, []);
 
   return (
-    <AssistantProvider>
-      <div className="min-h-screen bg-gray-50 text-zinc-900">
-        <div className="flex">
-          <Sidebar />
-          <div className="flex-1 relative" style={{ marginRight: isSidecarOpen && reserveSpace ? sidecarWidth : 0 }}>
-            <header className={cx("sticky top-0 z-10 border-b", GLASS)}>
-              <div className="h-14 px-4 md:px-6 flex items-center justify-between">
-                <h1 className="font-semibold">GENFOX • Data Analyst</h1>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    aria-label="Open Assistant"
-                    onClick={() => setIsSidecarOpen((v) => !v)}
-                    className="relative p-2 rounded-xl border border-white/60 bg-white/70 hover:bg-white"
-                    title="Approvals / Assistant (Ctrl/Cmd + .)"
-                  >
-                    <Bell className="h-5 w-5" />
-                    {pendingVisible && <span className="absolute top-1.5 right-1.5 inline-block h-2 w-2 rounded-full bg-emerald-600" />}
-                  </button>
-                  <img alt="user" className="h-8 w-8 rounded-full border" src="https://i.pravatar.cc/64?img=5" />
-                </div>
+    <div className="min-h-screen bg-gray-50 text-zinc-900">
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 relative" style={{ marginRight: isSidecarOpen && reserveSpace ? sidecarWidth : 0 }}>
+          <header className={cx("sticky top-0 z-10 border-b", GLASS)}>
+            <div className="h-14 px-4 md:px-6 flex items-center justify-between">
+              <h1 className="font-semibold">GENFOX • Data Analyst</h1>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  aria-label="Open Assistant"
+                  onClick={() => setIsSidecarOpen(v => !v)}
+                  className="relative p-2 rounded-xl border border-white/60 bg-white/70 hover:bg-white"
+                  title="Approvals / Assistant (Ctrl/Cmd + .)"
+                >
+                  <Bell className="h-5 w-5" />
+                  {pendingVisible && (
+                    <span className="absolute top-1.5 right-1.5 inline-block h-2 w-2 rounded-full bg-emerald-600" />
+                  )}
+                </button>
+                <img alt="user" className="h-8 w-8 rounded-full border" src="https://i.pravatar.cc/64?img=5" />
               </div>
-            </header>
-            <main className="p-4 md:p-6">
-              <Outlet />
-            </main>
-          </div>
+            </div>
+          </header>
+          <main className="p-4 md:p-6">
+            <Outlet />
+          </main>
         </div>
-        <AssistantSidecar open={isSidecarOpen} width={sidecarWidth} docked={reserveSpace} onClose={() => setIsSidecarOpen(false)} />
       </div>
+      <AssistantSidecar
+        open={isSidecarOpen}
+        width={sidecarWidth}
+        docked={reserveSpace}
+        onClose={() => setIsSidecarOpen(false)}
+      />
+    </div>
+  );
+}
+
+/** ---------- Provider wrapper ---------- */
+export default function AppLayout() {
+  return (
+    <AssistantProvider>
+      <AppShell />
     </AssistantProvider>
   );
 }

@@ -67,10 +67,9 @@ const getAvatarSeed = (name) => {
 function detectModeFromBotText(botText) {
   const text = botText.toLowerCase();
 
-  // Project/datasource: accept plural, combined, or any flexible phrasing
+  // Project/datasource
   if (
     (
-      // Must mention both project* and datasource* (any where, plural or singular)
       /(project.*datasource|datasource.*project)/i.test(botText) &&
       /(name|names|should i use|use for that)/i.test(botText)
     ) ||
@@ -80,7 +79,6 @@ function detectModeFromBotText(botText) {
       (text.includes("name") || text.includes("names") || text.includes("should i use") || text.includes("use for that"))
     )
   ) {
-    // Confirm with publish/mocking context (to avoid false positives)
     if (
       text.includes("publish") ||
       text.includes("publishing") ||
@@ -91,16 +89,17 @@ function detectModeFromBotText(botText) {
     }
   }
 
-  // Filter/csv: accept any phrasing with both present
+  // **Robust filter question detection**
+  // Match: "Do you want to apply any filter", "apply filters?", "filters (e.g." etc.
   if (
-    (
-      /filter.*csv|csv.*filter/i.test(botText)
-    ) ||
-    (
-      text.includes("filter") &&
-      text.includes("csv")
-    ) ||
-    /apply.*filter.*listing.*csv/i.test(botText)
+    /\bdo you want to apply (any )?filters?\b/i.test(botText)
+    || /\bapply (any )?filters?\b/i.test(botText)
+    || /\bapply a filter\b/i.test(botText)
+    || /\bapply filter\b/i.test(botText)
+    || /\bfilters?\s*\(e\.g\./i.test(botText)   // filters (e.g.,
+    || /filter.*(example|eg|e\.g\.)/i.test(botText)
+    || (text.includes("filter") && text.includes("reply 'no'"))
+    // ...add any more specific relevant phrasing you know your agent uses
   ) {
     return "filter";
   }
@@ -151,7 +150,7 @@ export default function Chat() {
 
     try {
       const response = await fetch(
-        "https://agent-tableau-backend.onrender.com/chat", {
+        "http://127.0.0.1:8000/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: userMessage.text }),
@@ -195,7 +194,7 @@ export default function Chat() {
       };
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
-      fetch("https://agent-tableau-backend.onrender.com/chat", {
+      fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: answer }),
