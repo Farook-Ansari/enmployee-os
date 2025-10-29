@@ -1,21 +1,17 @@
 import { useState, useRef, useEffect } from "react";
+import { useAssistant } from "./AssistantContext.jsx";
 
+// -- DataTable and CSV helpers as before (unchanged) --
 function DataTable({ rows, columns }) {
   if (!rows || rows.length === 0) return null;
   const cols = columns && columns.length ? columns : Object.keys(rows[0]);
-
   return (
     <div className="overflow-x-auto rounded-xl border border-emerald-200 bg-white">
       <table className="min-w-full text-sm">
         <thead className="bg-emerald-50">
           <tr>
             {cols.map((c) => (
-              <th
-                key={c}
-                className="px-3 py-2 text-left font-semibold text-zinc-800"
-              >
-                {c}
-              </th>
+              <th key={c} className="px-3 py-2 text-left font-semibold text-zinc-800">{c}</th>
             ))}
           </tr>
         </thead>
@@ -34,7 +30,6 @@ function DataTable({ rows, columns }) {
     </div>
   );
 }
-
 const rowsToCsv = (rows, columns) => {
   if (!rows?.length) return "";
   const cols = columns && columns.length ? columns : Object.keys(rows[0]);
@@ -52,7 +47,6 @@ const rowsToCsv = (rows, columns) => {
     .join("\n");
   return `${header}\n${body}`;
 };
-
 const downloadCsv = (rows, columns, filename = "tableau_view.csv") => {
   const csv = rowsToCsv(rows, columns);
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -63,13 +57,56 @@ const downloadCsv = (rows, columns, filename = "tableau_view.csv") => {
   a.click();
   URL.revokeObjectURL(url);
 };
-
-// --- Helper for avatar swap (Alex <-> Stew) ---
 const getAvatarSeed = (name) => {
   if (name === "Alex") return "stew";
   if (name === "stew") return "Alex";
   return name;
 };
+
+// -- Improved flexible detection logic --
+function detectModeFromBotText(botText) {
+  const text = botText.toLowerCase();
+
+  // Project/datasource: accept plural, combined, or any flexible phrasing
+  if (
+    (
+      // Must mention both project* and datasource* (any where, plural or singular)
+      /(project.*datasource|datasource.*project)/i.test(botText) &&
+      /(name|names|should i use|use for that)/i.test(botText)
+    ) ||
+    (
+      text.includes("project") &&
+      text.includes("datasource") &&
+      (text.includes("name") || text.includes("names") || text.includes("should i use") || text.includes("use for that"))
+    )
+  ) {
+    // Confirm with publish/mocking context (to avoid false positives)
+    if (
+      text.includes("publish") ||
+      text.includes("publishing") ||
+      text.includes("mock data source") ||
+      text.includes("should i use for that")
+    ) {
+      return "project-ds";
+    }
+  }
+
+  // Filter/csv: accept any phrasing with both present
+  if (
+    (
+      /filter.*csv|csv.*filter/i.test(botText)
+    ) ||
+    (
+      text.includes("filter") &&
+      text.includes("csv")
+    ) ||
+    /apply.*filter.*listing.*csv/i.test(botText)
+  ) {
+    return "filter";
+  }
+
+  return null;
+}
 
 export default function Chat() {
   const BOT_NAME = "Alex";
@@ -89,12 +126,15 @@ export default function Chat() {
 
   const hasUserMessage = messages.some((m) => m.sender === "user");
 
+  // Assistant context for pending badge
+  const { setPendingRequest } = useAssistant();
+
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
     if (hasUserMessage) scrollToBottom();
-  }, [messages]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   const handleSend = async () => {
     if (input.trim() === "" || isLoading) return;
@@ -110,12 +150,13 @@ export default function Chat() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://agent-tableau-backend.onrender.com/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage.text }),
-      });
-
+      const response = await fetch(
+        "https://agent-tableau-backend.onrender.com/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage.text }),
+        }
+      );
       const data = await response.json();
       const botMessage = {
         id: Date.now() + 1,
@@ -124,8 +165,11 @@ export default function Chat() {
         attachments: data?.attachments || [],
       };
       setMessages((prev) => [...prev, botMessage]);
+
+      // Use improved detection for notification/sidecar
+      const detectedMode = detectModeFromBotText(botMessage.text);
+      if (detectedMode) setPendingRequest(detectedMode);
     } catch (error) {
-      console.error("Failed to get response from backend:", error);
       const errorMessage = {
         id: Date.now() + 1,
         text:
@@ -139,16 +183,62 @@ export default function Chat() {
     }
   };
 
+  // Listen for sidecar answers:
+  useEffect(() => {
+    const onSidecarAnswer = (e) => {
+      const { answer } = e.detail;
+      const userMessage = {
+        id: Date.now(),
+        text: answer,
+        sender: "user",
+        attachments: [],
+      };
+      setMessages((prev) => [...prev, userMessage]);
+      setIsLoading(true);
+      fetch("https://agent-tableau-backend.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: answer }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now() + 1,
+              text: data?.response || "Sorry, I encountered an issue.",
+              sender: "bot",
+              attachments: data?.attachments || [],
+            },
+          ]);
+        })
+        .catch(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now() + 1,
+              text: "Error using your sidecar reply.",
+              sender: "bot",
+              attachments: [],
+            },
+          ]);
+        })
+        .finally(() => setIsLoading(false));
+    };
+    window.addEventListener("sidecarAnswer", onSidecarAnswer);
+    return () =>
+      window.removeEventListener("sidecarAnswer", onSidecarAnswer);
+  }, []);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSend();
   };
 
-  /* -------------------- LANDING MODE: centered block, left-aligned first bubble -------------------- */
+  // Welcome UI (unchanged)
   if (!hasUserMessage) {
     return (
       <div className="min-h-screen grid place-items-center bg-zinc-50">
         <div className="w-[min(52rem,92vw)] px-4 md:px-6">
-          {/* Welcome bubble (left-aligned within centered container) */}
           <div className="flex items-start gap-3 justify-start mb-8">
             <div className="w-10 h-10 rounded-full flex-shrink-0 ring-2 ring-emerald-200">
               <img
@@ -164,7 +254,6 @@ export default function Chat() {
             </div>
           </div>
 
-          {/* Centered input */}
           <div className="rounded-full p-2 border border-emerald-300 bg-white shadow-sm focus-within:ring-2 focus-within:ring-emerald-300">
             <div className="flex items-center">
               <input
@@ -207,10 +296,9 @@ export default function Chat() {
     );
   }
 
-  /* -------------------- CHAT MODE: top-aligned thread + sticky input -------------------- */
+  // The main chat view, unchanged
   return (
     <div className="font-sans text-zinc-900 flex flex-col h-screen w-full">
-      {/* Messages */}
       <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-zinc-50 max-h-screen">
         {messages.map((message) => (
           <div
@@ -223,7 +311,7 @@ export default function Chat() {
               <div className="w-8 h-8 rounded-full flex-shrink-0 ring-2 ring-emerald-200">
                 <img
                   src={`https://i.pravatar.cc/120?u=${BOT_AVATAR_SEED}`}
-                  alt={`${BOT_NAME} profile`}
+                  alt={BOT_NAME}
                   className="w-full h-full rounded-full object-cover"
                 />
               </div>
@@ -241,8 +329,6 @@ export default function Chat() {
                     {message.text}
                   </p>
                 )}
-
-              {/* Attachments */}
               {message.attachments?.map((att, idx) => (
                 <div key={idx} className="mt-3">
                   {att.type === "image" && (
@@ -259,7 +345,6 @@ export default function Chat() {
                       />
                     </>
                   )}
-
                   {att.type === "table" && (
                     <>
                       {att.caption ? (
@@ -267,7 +352,6 @@ export default function Chat() {
                           {att.caption}
                         </div>
                       ) : null}
-
                       <div className="flex justify-end mb-2">
                         <button
                           onClick={() => downloadCsv(att.rows, att.columns)}
@@ -276,14 +360,12 @@ export default function Chat() {
                           Download CSV
                         </button>
                       </div>
-
                       <DataTable rows={att.rows} columns={att.columns} />
                     </>
                   )}
                 </div>
               ))}
             </div>
-
             {message.sender === "user" && (
               <div className="w-8 h-8 rounded-full bg-amber-300/90 flex items-center justify-center text-zinc-800 font-bold text-sm flex-shrink-0 ring-1 ring-amber-400">
                 U
@@ -294,11 +376,10 @@ export default function Chat() {
 
         {isLoading && (
           <div className="flex items-end gap-3 justify-start">
-            {/* Bot typing indicator */}
             <div className="w-8 h-8 rounded-full flex-shrink-0 ring-2 ring-emerald-200">
               <img
                 src={`https://i.pravatar.cc/120?u=${BOT_AVATAR_SEED}`}
-                alt={`${BOT_NAME} profile`}
+                alt={BOT_NAME}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
@@ -313,8 +394,6 @@ export default function Chat() {
         )}
         <div ref={messagesEndRef} />
       </main>
-
-      {/* Input */}
       <footer className="bg-white border-t border-emerald-200 sticky bottom-0">
         <div className="flex items-center bg-white rounded-full p-2 border border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-300 max-w-[52rem] mx-auto my-2">
           <input
